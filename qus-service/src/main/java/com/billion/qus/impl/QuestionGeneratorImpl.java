@@ -57,6 +57,7 @@ public class QuestionGeneratorImpl implements QuestionGenerator {
                 .collect(Collectors.toList());
 
         LOGGER.info("About to save {} questions for quiz id={}", listOfQuestions.size(), quizDto.getId());
+         LOGGER.debug("About to save {} questions for quiz id={}", listOfQuestions.size(), quizDto.getId());
         try {
             questionRepo.saveAll(listOfQuestions);
             LOGGER.info("Successfully saved {} questions for quiz id={}", listOfQuestions.size(), quizDto.getId());
