@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: quizz-service
+  config:
+    import: optional:configserver:http://localhost:9094
+  profiles:
+    active: dev
+# rabbit properties no use bcz. I added kafka too
+#  rabbitmq:
+#    host: localhost
+#    port: 5672
+#    username: guest
+#    password: guest
+#    connection-timeout: 10s
+
+  cloud:
+    function:
+      web:
+        path: "/function"
+      definition: getQuizAcknowledged
+    stream:
+      bindings:
+        quizCreatedBinding-out-0:
+          destination: quiz-created
+          group: ${spring.application.name}
+        getQuizAcknowledged-in-0:
+          destination: quiz-acknowledged
+          group: ${spring.application.name}
+#kafka
+      defaultBinder: kafka
+      kafka:
+        binder:
+          brokers:
+            -localhost: 9092
+
+
+eureka:
+  instance:
+    prefer-ip-address: true
+#    ip-address: 127.0.0.1
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 2
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

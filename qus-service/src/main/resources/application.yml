@@ -1,0 +1,64 @@
+server:
+  port: 9097
+spring:
+  application:
+    name: quiz-generator
+  config:
+    import: optional:configserver:http://localhost:9097
+  profiles:
+    active: dev
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    connection-timeout: 10s
+  cloud:
+    function:
+      definition: getQuizBinding
+      web:
+        path: "/function"
+    stream:
+      bindings:
+        getQuizBinding-in-0:
+          destination: quiz-created
+          group: ${spring.application.name}
+        getQuizBinding-out-0:
+          destination: quiz-acknowledged
+          group: ${spring.application.name}
+  #kafka
+      defaultBinder: kafka
+      kafka:
+        binder:
+          brokers:
+            -localhost: 9092
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      base-url: https://api.groq.com/openai
+      chat:
+        options:
+          model: llama-3.1-8b-instant
+          temperature: 0.7
+
+
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 2
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000

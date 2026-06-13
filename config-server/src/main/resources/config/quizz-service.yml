@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: quizz-service
+  main:
+    lazy-initialization: false
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/quizdb
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 5000
+            readTimeout: 5000
+server:
+  port: 9098
+  profiles:
+    active: dev
+
+
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 5000
+            readTimeout: 5000
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
